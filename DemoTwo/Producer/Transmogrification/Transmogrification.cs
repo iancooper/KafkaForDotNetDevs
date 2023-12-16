@@ -2,6 +2,6 @@ namespace Transmogrification;
 
 public class TransmogrificationSettings
 {
-    public string? Name { get; set; }
-    public string? Transformation { get; set; }
+    public string Name { get; set; } = String.Empty;
+    public string Transformation { get; set; } = string.Empty;
 }

@@ -9,12 +9,6 @@ public class Box
         return AnsiConsole.Ask<string>("What's your [green]name[/]?");
     }
     
-    public void ConfirmTransformation()
-    {
-        AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine("[grey]Press y to begin transfmogrification...[/]");
-    }
-    
     public void EnterTransmogrifier(TransmogrificationSettings settings)
     {
         WriteDivider("Transmogrifier");
