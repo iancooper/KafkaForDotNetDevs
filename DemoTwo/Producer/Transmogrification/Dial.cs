@@ -4,25 +4,9 @@ namespace Transmogrification;
 
 public class Dial
 {
-    public bool AskConfirmation()
+    public string AskForTransformation(string selfName)
     {
-        if (!AnsiConsole.Confirm("Run Transmogrifier?"))
-        {
-            AnsiConsole.MarkupLine("Ok... :(");
-            return false;
-        }
-
-        return true;
-    }
-
-    public string AskName()
-    {
-        var name = AnsiConsole.Ask<string>("What's your [green]name[/]?");
-        return name;
-    }
-    
-    public static string AskTransformation(string selfName)
-    {
+        WriteDivider("Dial");
         return AnsiConsole.Prompt(
             new TextPrompt<string>("Which [green]transformation[/]?")
                 .InvalidChoiceMessage("[red]That's not a supported transformation![/]")
@@ -37,8 +21,19 @@ public class Dial
                 .AddChoice("Worm")
                 );
     }
+    
+    public void DisplaySettings(TransmogrificationSettings settings)
+    {
+        AnsiConsole.WriteLine();
+        AnsiConsole.Write(new Rule("[yellow]Dial[/]").RuleStyle("grey").LeftJustified());
+        AnsiConsole.Write(new Table().AddColumns("[grey]Setting[/]", "[grey]Value[/]")
+            .RoundedBorder()
+            .BorderColor(Color.Grey)
+            .AddRow("[grey]Name[/]", settings.Name)
+            .AddRow("[grey]Transformation[/]", settings.Transformation));
+    }
 
-    public void WriteDivider(string text)
+    private void WriteDivider(string text)
     {
         AnsiConsole.WriteLine();
         AnsiConsole.Write(new Rule($"[yellow]{text}[/]").RuleStyle("grey").LeftJustified());

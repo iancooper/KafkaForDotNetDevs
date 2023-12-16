@@ -396,3 +396,8 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Kafka Files Created by Docker
+broker/
+data/
+zoo/
