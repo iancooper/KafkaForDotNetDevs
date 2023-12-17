@@ -1,14 +1,16 @@
-using System.Text.Json;
 using Confluent.Kafka;
 using Spectre.Console;
 
 namespace Transmogrifier;
 
-public class MessagePump(string topic, Dictionary<string, string> consumerConfig) 
+public class MessagePump(string topic, Dictionary<string, string> consumerConfig)
 {
     private readonly IConsumer<string, string> _consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
 
-    public async Task Run(Action<Transmogrification> handler, CancellationToken cancellationToken = default)
+    public async Task Run<TDataType>(
+        Func<Message<string, string>, TDataType> translator,
+        Action<TDataType> handler, 
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -24,9 +26,9 @@ public class MessagePump(string topic, Dictionary<string, string> consumerConfig
                     continue;
                 }
                 
-                var transmogrification = TranslateMessage(consumeResult.Message);
+                var dataType = translator(consumeResult.Message);
 
-                handler(transmogrification);
+                handler(dataType);
             }
         }
         catch(ConsumeException e)
@@ -41,11 +43,5 @@ public class MessagePump(string topic, Dictionary<string, string> consumerConfig
         {
             _consumer.Close();
         }
-    }
-    
-    private Transmogrification TranslateMessage(Message<string, string> message)
-    {
-        return new Transmogrification(message.Key, message.Value);
-
     }
 }
