@@ -37,7 +37,7 @@ public class MessagePump(string topic, Dictionary<string, string> consumerConfig
         }
         catch (OperationCanceledException)
         {
-            //Pump was cancelled, do nothing
+            //Pump was cancelled, exit
         }
         finally
         {
