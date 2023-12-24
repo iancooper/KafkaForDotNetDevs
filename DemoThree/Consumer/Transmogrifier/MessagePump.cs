@@ -3,13 +3,19 @@ using Spectre.Console;
 
 namespace Transmogrifier;
 
-public class MessagePump(string topic, Dictionary<string, string> consumerConfig)
+public record HandleResult(bool Success);
+
+public class MessagePump(string topic, ConsumerConfig consumerConfig)
 {
-    private readonly IConsumer<string, string> _consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
+    private readonly IConsumer<string, string> _consumer = new ConsumerBuilder<string, string>(consumerConfig)
+        .SetErrorHandler((_, e) => Console.WriteLine($"Error: {e.Reason}"))
+        .SetLogHandler((_, lm) => Console.WriteLine($"Facility: {lm.Facility} Level: {lm.Level} Log: {lm.Message}"))
+        .SetPartitionsRevokedHandler((c, partions) => partions.ForEach(p => c.StoreOffset(p)))
+        .Build();
 
     public async Task Run<TDataType>(
         Func<Message<string, string>, TDataType> translator,
-        Action<TDataType> handler, 
+        Func<TDataType, HandleResult> handler, 
         CancellationToken cancellationToken = default)
     {
         try
@@ -28,7 +34,14 @@ public class MessagePump(string topic, Dictionary<string, string> consumerConfig
                 
                 var dataType = translator(consumeResult.Message);
 
-                handler(dataType);
+                var result = handler(dataType);
+                if (result.Success)
+                {
+                    //We don't want to commit unless we have successfully handled the message
+                    //_consumer.Commit(consumeResult); would commit manually, but with EnableAutoOffsetStore disabled,
+                    //we can instead just manually store "done" offsets for a background thread to commit
+                    _consumer.StoreOffset(consumeResult);
+                }
             }
         }
         catch(ConsumeException e)

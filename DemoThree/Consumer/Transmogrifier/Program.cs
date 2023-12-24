@@ -1,14 +1,18 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using Confluent.Kafka;
 using Spectre.Console;
 using Transmogrifier;
 
 const string topic = "transmogrification";
 
-var consumerConfig = new Dictionary<string, string>()
+var consumerConfig = new ConsumerConfig()
 {
-    { "bootstrap.servers", "localhost:9092" },
-    { "group.id", "transmogrification-consumer" },
+    BootstrapServers = "localhost:9092",
+    GroupId = "transmogrification-consumer",
+    AutoOffsetReset = AutoOffsetReset.Earliest,
+    EnableAutoCommit = true,
+    EnableAutoOffsetStore = false
 };
 
 CancellationTokenSource cts = new CancellationTokenSource();
@@ -36,6 +40,8 @@ if (box.StarTransformation())
             table.AddRow(transmogrification.From, transmogrification.To, "Success");
         
             AnsiConsole.Write(table);
+
+            return new HandleResult(true);
 
         }, 
     cts.Token);
