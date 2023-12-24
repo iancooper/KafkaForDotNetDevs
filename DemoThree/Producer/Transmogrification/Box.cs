@@ -21,4 +21,9 @@ public class Box
         AnsiConsole.WriteLine();
         AnsiConsole.Write(new Rule($"[yellow]{text}[/]").RuleStyle("grey").LeftJustified());
     }
+
+    public bool AskIfDone()
+    {
+        return AnsiConsole.Confirm("Are you [green]done[/]?");
+    }
 }

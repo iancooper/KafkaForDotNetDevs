@@ -19,7 +19,7 @@ public class Dispatcher(string topic, ProducerConfig producerConfig, IOutbox out
                 //we use an outbox to be able to retry sending the message if it fails
                 //we don't show a sweeper in this example, but it would be a separate process that would
                 //periodically check the outbox for messages that haven't been persisted yet and retry sending them
-                outbox.MarkAsPersisted(report.Topic, report.Key);
+                outbox.MarkAsPersisted(report.Topic, report.Key, report.Partition, report.Status, report.Timestamp);
             };
             
             var message = new Message<string, string>

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Spectre.Console;
 
 namespace Transmogrification;
@@ -39,4 +40,34 @@ public class Dial
         AnsiConsole.Write(new Rule($"[yellow]{text}[/]").RuleStyle("grey").LeftJustified());
     }
 
+    public void DisplaySentOrLostMessages(IOutbox outbox, string topic)
+    {
+        var persisted = outbox.FindPersisted(topic).ToList();
+        WriteDivider("Sent Messages");
+        var sentMessages = new Table()
+            .AddColumns("[grey]Topic[/]", "[grey]Key[/]", "[grey]Value[/]", "[grey]Partition[/]", "[grey]Status[/]", "[grey]Timestamp[/]")
+            .RoundedBorder()
+            .BorderColor(Color.Grey);
+        
+        foreach (var entry in persisted)
+        {
+            sentMessages.AddRow(entry.Topic, entry.Key, entry.Value.Value, entry.Partition.Value.ToString(), 
+                entry.Status.ToString(), entry.Timestamp.UtcDateTime.ToString(CultureInfo.InvariantCulture));
+        }
+        
+        AnsiConsole.Write(sentMessages);
+        
+        var notPersisted = outbox.FindNotPersisted(topic).ToList();
+        WriteDivider("Lost Messages");
+        var lostMessages = new Table().AddColumns("[grey]Topic[/]", "[grey]Key[/]", "[grey]Value[/]")
+            .RoundedBorder()
+            .BorderColor(Color.Grey);
+        
+        foreach (var entry in notPersisted)
+        {
+            lostMessages.AddRow(entry.Topic, entry.Key, entry.Value.Value);
+        }
+        
+        AnsiConsole.Write(lostMessages);
+    }
 }

@@ -12,7 +12,7 @@ var producerConfig = new ProducerConfig
     EnableDeliveryReports = true,
     ClientId = Dns.GetHostName(),
     Acks = Acks.Leader,
-    EnableIdempotence = true,
+    //EnableIdempotence = true, //de-duplication, and ordering requires Acks.All and sets MaxInFlight to 5, MessageSendMaxRetries to MAX_INT
     MessageSendMaxRetries = 3,
     MaxInFlight = 1,
 };
@@ -20,17 +20,32 @@ var producerConfig = new ProducerConfig
 var theBox = new Box();
 var theDial = new Dial();
 
-var settings = new TransmogrificationSettings();
-settings.Name = theBox.AskName(); 
+//a real outbox would be persistent and would be able to survive a restart of the application
+var outbox = new InMemoryOutbox(new []{topic});
+var dispatcher = new Dispatcher(topic, producerConfig, outbox);
+//var dispatcher = new AsyncDispatcher(topic, producerConfig, outbox);
 
-settings.Transformation = theDial.AskForTransformation(settings.Name);
+bool stop = false;
 
-theDial.DisplaySettings(settings);
+while (!stop)
+{
 
-theBox.EnterTransmogrifier(settings);
+    var settings = new TransmogrificationSettings();
+    settings.Name = theBox.AskName();
 
-var dispatcher = new Dispatcher(topic, producerConfig, new InMemoryOutbox(new []{topic}));
-dispatcher.Transmogrify(settings);
+    settings.Transformation = theDial.AskForTransformation(settings.Name);
+
+    theDial.DisplaySettings(settings);
+
+    theBox.EnterTransmogrifier(settings);
+
+    dispatcher.Transmogrify(settings);
+    //await dispatcher.Transmogrify(settings);
+    
+    stop = theBox.AskIfDone();
+}
+
+theDial.DisplaySentOrLostMessages(outbox, topic);
 
 
 
