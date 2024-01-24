@@ -12,6 +12,7 @@ var consumerConfig = new ConsumerConfig()
     GroupId = "transmogrification-consumer",
     AutoOffsetReset = AutoOffsetReset.Earliest,
     EnableAutoCommit = true,
+    //AutoCommitIntervalMs = 5000,
     EnableAutoOffsetStore = false
 };
 
