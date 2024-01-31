@@ -1,4 +1,5 @@
 using System.Globalization;
+using Confluent.SchemaRegistry;
 using Spectre.Console;
 
 namespace Transmogrification;
@@ -69,5 +70,18 @@ public class Dial
         }
         
         AnsiConsole.Write(lostMessages);
+    }
+
+    public void DisplaySchemaOfSentMessage(SchemaRegistryConfig schemaRegistryConfig, string topicName)
+    {
+        WriteDivider("Schema");
+        AnsiConsole.WriteLine("The JSON schema corresponding to the written data:");
+        using (var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig))
+        {
+            //assumes the default subject name strategy of topic name + "-value"
+            var schema = schemaRegistry.GetLatestSchemaAsync(SubjectNameStrategy.Topic.ConstructValueSubjectName(topicName)).Result;
+            AnsiConsole.WriteLine("The JSON schema corresponding to the written data:");
+            AnsiConsole.WriteLine(schema.SchemaString);
+        }
     }
 }

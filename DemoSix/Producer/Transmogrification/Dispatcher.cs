@@ -24,7 +24,7 @@ public class Dispatcher : IDisposable
             .SetLogHandler((_, message) =>
                 Console.WriteLine($"Facility: {message.Facility}-{message.Level} Message: {message.Message}"))
             .SetErrorHandler((_, e) => Console.WriteLine($"Error: {e.Reason}. Is Fatal: {e.IsFatal}"))
-            .SetValueSerializer(new JsonSerializer<TransmogrificationSettings>(_schemaRegistryClient, serializerConfig))
+            .SetValueSerializer(new JsonSerializer<TransmogrificationSettings>(_schemaRegistryClient, serializerConfig).AsSyncOverAsync())
             .Build();
     }
 

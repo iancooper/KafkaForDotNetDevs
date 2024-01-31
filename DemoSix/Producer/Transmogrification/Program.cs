@@ -49,6 +49,8 @@ while (!stop)
 
     dispatcher.Transmogrify(settings);
     
+    theDial.DisplaySchemaOfSentMessage(schemaRegistryConfig, topic);
+    
     stop = theBox.AskIfDone();
 }
 
