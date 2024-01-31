@@ -35,7 +35,6 @@ public class Dispatcher(string topic, ProducerConfig producerConfig, IOutbox out
             //We could send multiple messages as part of the transaction, but we only send one
             _producer.Produce(topic, message, handler);
             
-            //If the outbox add fails, then the transaction will be aborted and the message won't be sent
             outbox.Add(topic, message.Key, message);
             
             _producer.CommitTransaction(TimeSpan.FromSeconds(10));
