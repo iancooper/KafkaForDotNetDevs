@@ -9,6 +9,7 @@ var consumerConfig = new Dictionary<string, string>()
 {
     { "bootstrap.servers", "localhost:9092" },
     { "group.id", "transmogrification-consumer" },
+    { "auto.offset.reset", "earliest" }
 };
 
 CancellationTokenSource cts = new CancellationTokenSource();
