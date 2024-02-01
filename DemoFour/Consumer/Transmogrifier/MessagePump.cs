@@ -41,6 +41,9 @@ public class MessagePump(string topic, ConsumerConfig consumerConfig)
                     //_consumer.Commit(consumeResult); would commit manually, but with EnableAutoOffsetStore disabled,
                     //we can instead just manually store "done" offsets for a background thread to commit
                     _consumer.StoreOffset(consumeResult);
+                    AnsiConsole.WriteLine("Stored Offset: Topic: " + consumeResult.TopicPartitionOffset.Topic 
+                            + " Partition: " + consumeResult.TopicPartitionOffset.Partition 
+                            + " Offset: " + consumeResult.TopicPartitionOffset.Offset);
                 }
             }
         }

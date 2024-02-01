@@ -41,6 +41,9 @@ public class MessagePump(string topic, ConsumerConfig consumerConfig)
                     //Commit directly. Normally we would want to batch these up, but for the demo we will
                     //commit after each message
                     _consumer.Commit(consumeResult);
+                    AnsiConsole.WriteLine("Committed Offset: Topic: " + consumeResult.TopicPartitionOffset.Topic 
+                            + " Partition: " + consumeResult.TopicPartitionOffset.Partition 
+                            + " Offset: " + consumeResult.TopicPartitionOffset.Offset);
                 }
             }
         }
